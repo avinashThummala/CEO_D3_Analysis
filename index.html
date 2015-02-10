@@ -13,11 +13,29 @@
 		<script type="text/javascript" src="js/jquery.min.js"></script>
 		<script type="text/javascript">
 
-			var data={}, xAxisTicks=[0, 50, 100], svgWidth, xScale, xAxis, allKeys, selectedKeys, pKey,
-				svgMargins={ top:0, left:60, right:20, bottom:20 }, cIndex=-1, cTransitionTime=30, bTransitionTime=0.25
+			var data={}, allKeys, selectedKeys, pKey, allModifiedKeys,
+				xAxisTicks=[0, 50, 100], xScale, xAxis, 
+				svgMargins={ top:0, left:60, right:20, bottom:20 }, svgWidth, 
+				cIndex=-1, bCIndex=-1, 
+				cTransitionTime=30, bTransitionTime=0.25, cInterval, sResults=0
+
+			function addTimer()
+			{
+				if(! sResults)
+					cInterval = setInterval(drawNextChart, cTransitionTime*1000)				
+			}				
+
+			function removeTimer()
+			{
+				if(! sResults)
+					clearInterval(cInterval)
+			}
 
 			function updateChart()
 			{
+
+				console.log("Called updateChart")
+
 				pKey=selectedKeys[cIndex]											
 
 				var $container = $('#svgChart'), $noRemove = $container.find('#controls')
@@ -27,22 +45,25 @@
 
 			    $('#next').click( function() {
 			    	
+			    	removeTimer()
 					drawNextChart()
+					addTimer()
 			    })							    
 
 				$('#prev').click(function() {
 
+					removeTimer()
 					drawPreviousChart()
+					addTimer()
 			    })				
 			
 				drawChart()
-
-				/*Draw next chart after 30 seconds*/
-				setInterval(drawNextChart, cTransitionTime*1000)				
 			}	
 
 			function drawPreviousChart()
 			{
+				console.log("Called drawPreviousChart")
+
 				if(cIndex==0)
 					cIndex=selectedKeys.length-1
 				else
@@ -53,6 +74,8 @@
 
 			function drawNextChart()
 			{
+				console.log("Called drawNextChart")
+
 				cIndex=(cIndex+1)%selectedKeys.length
 
 				updateChart()
@@ -74,6 +97,14 @@
 				var subSvg = mSvg			        
 					        .append('g')
 					        .attr('transform', 'translate(' + svgMargins.left + ',' + svgMargins.top + ')')
+
+				subSvg.append("text")
+				        .attr("transform", "rotate(-90)")
+				        .attr("y", 0-svgMargins.left)
+				        .attr("x", 0-(data[pKey]['svgHeight']/2))
+				        .attr("dy", "1em")
+				        .style({'font-family':'Calibri', 'font-size': '10pt', 'font-weight': 'bold', 'text-anchor':'middle'})
+				        .text("Level from CEO")					        
 
 				var barHeight = data[pKey]['yScale'].rangeBand()
 
@@ -138,12 +169,12 @@
 					})									    	
 
 			    subSvg.append('g')
-			        .attr('class', 'axis')
+			        .attr('class', 'xAxis')
 			        .attr('transform', 'translate(0,' + (data[pKey]['svgHeight']-svgMargins.bottom) + ')')
 			        .call(xAxis)
 
 				subSvg.append('g')
-				    .attr('class', 'axis')
+				    .attr('class', 'yAxis')
 				    .call(yAxis)
 
 				var arrayLength = xAxisTicks.length, yAxisExtents = data[pKey]['yScale'].rangeExtent()	     					
@@ -159,6 +190,33 @@
 					    .attr("x2", xPos)
 					    .attr("y2", yAxisExtents[1])					
 				}
+
+			}
+
+			function getModifiedText(str)
+			{
+				return str.toUpperCase().replace(/\s+/g, '')
+			}
+
+			function fillSelectedKeys()
+			{
+				selectedKeys=[]
+
+				var arrayLength = allModifiedKeys.length
+
+				for(var index=0; index<arrayLength; index++)
+				{
+					console.log("Trying out index "+index)
+
+					if( allModifiedKeys[index].indexOf( getModifiedText($("#sText").val()) ) > -1)	
+					{
+						console.log("Selected index"+index)
+						selectedKeys.push(allKeys[index])									
+					}
+				}
+
+				console.log(selectedKeys)
+				console.log($("#sText").val())
 
 			}
 
@@ -180,13 +238,15 @@
         				.tickFormat( function(d) { return d+"%" } )
         				.orient('bottom')
 
-				allKeys=[]        				   
+				allKeys=[] 
+				allModifiedKeys=[]       				   
 
 				$('#cTitle').hide()
 				
 				for(var key in data)
 				{
 					allKeys.push(key)
+					allModifiedKeys.push(getModifiedText(key))
 
 					$('#cTitle').text(key)
 
@@ -212,9 +272,66 @@
 				}
 
 				selectedKeys=allKeys		
-				$('#cTitle').show()									
+				$('#cTitle').show()	
 
-				drawNextChart()   			
+			    $('#sSearch').click( function() {
+			    	
+			    	removeTimer()
+
+					$("#divContent").hide()
+
+					$("#sText").val('')
+					$("#searchContent").show()
+
+					if(!sResults)
+						bCIndex=cIndex
+			    })
+
+			    $('#bStart').click( function() {
+
+			    	fillSelectedKeys()
+
+			    	if(selectedKeys.length>0)
+			    	{
+						cIndex=-1		   						 	
+				    	
+						$('#searchELabel').hide()				    	
+						$("#searchContent").hide()
+
+						$('#sSearch').val('Click here to make a new search')						
+						$("#divContent").show()
+
+						drawNextChart()
+						sResults=1
+					}
+					else
+					{						
+						$('#searchELabel').text("No matches found. Please try again.")
+						$('#searchELabel').show()
+					}
+
+			    })
+
+			    $('#bReset').click( function() {
+
+			    	console.log("Called Reset")			    
+
+					selectedKeys=allKeys
+					cIndex=bCIndex
+					sResults=0
+
+					$('#sSearch').val('Click here to search for an organisation')
+					$("#divContent").show()
+					$("#searchContent").hide()
+
+					drawNextChart()
+					addTimer()
+			    })
+
+				drawNextChart()
+				addTimer()   
+
+				console.log(allModifiedKeys)			
 			}
 	
 			window.onload = function()
@@ -257,12 +374,10 @@
 			</div>	
 
 			<div id="svgChart">
-
 			    <div id="controls">
 			        <img src="css/images/previous.png" id="prev" />
 			        <img src="css/images/next.png" id="next" />
 			    </div>				
-
 			</div>			
 
 			<div id="dLabels">
@@ -273,9 +388,23 @@
 
 			<div id="dLegend">
 				<span class="sLegend"><span class="wLegend"></span>&nbsp;Women%</span>
-				<span class="sLegend"><span class="mLegend"></span>&nbsp;Men%</span>
+				<span class="sLegend"><span class="mLegend"></span>&nbsp;Men%</span><br>
+				<input type="submit" id="sSearch" value="Click here to search for an organisation"/>
 			</div>		
 					
+		</div>
+
+		<div id="searchContent" align="center" style="display: none;">
+
+			<label id="searchELabel" style="display:none;"></label><br><br>
+
+  			<input type="text" id="sText"><br>
+
+  			<span>
+  				<input type="submit" value="Start Search" id="bStart">
+				<input type="submit" value="Reset Search" id="bReset">
+			</span>  				
+
 		</div>
 
 	</body>

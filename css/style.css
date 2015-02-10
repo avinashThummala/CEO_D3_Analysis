@@ -34,6 +34,13 @@ X axis 'source' line: Calibri 6pt
 	overflow: auto
 }
 
+#searchContent {
+
+	width: 340px;
+	height: 370px;
+	overflow: auto
+}
+
 #cTitle {
 
 	font-family: Calibri;
@@ -99,17 +106,30 @@ X axis 'source' line: Calibri 6pt
 #dLegend .slegend .mLegend { 
 
 	background-color: #5B90D8; 
-}			
+}
 
-.axis path, .axis line {
+.xAxis path, .xAxis line {
 
     fill: none;
     stroke: none;
 }
 
-.axis text {
+.xAxis text, #searchELabel {
 
     font-family: Calibri;
     font-size: 10pt;
     font-weight: bold;
+}					
+
+.yAxis path, .yAxis line {
+
+    fill: none;
+    stroke: none;
+}
+
+.yAxis text {
+
+    font-family: Calibri;
+    font-size: 10pt;
+    /*font-weight: bold;*/
 }		
