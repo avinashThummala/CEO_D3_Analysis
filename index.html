@@ -1,0 +1,283 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html>
+
+    <head>
+
+        <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+        <meta content="utf-8" http-equiv="encoding">
+
+		<link rel="stylesheet" type="text/css" href="css/style.css">
+
+		<script type="text/javascript" src="js/d3.v3.min.js"></script>
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+		<script type="text/javascript">
+
+			var data={}, xAxisTicks=[0, 50, 100], svgWidth, xScale, xAxis, allKeys, selectedKeys, pKey,
+				svgMargins={ top:0, left:60, right:20, bottom:20 }, cIndex=-1, cTransitionTime=30, bTransitionTime=0.25
+
+			function updateChart()
+			{
+				pKey=selectedKeys[cIndex]											
+
+				var $container = $('#svgChart'), $noRemove = $container.find('#controls')
+				$container.html($noRemove)
+
+				$('#controls').css('top', (data[pKey]['svgHeight']/2-16)+'px')	
+
+			    $('#next').click( function() {
+			    	
+					drawNextChart()
+			    })							    
+
+				$('#prev').click(function() {
+
+					drawPreviousChart()
+			    })				
+			
+				drawChart()
+
+				/*Draw next chart after 30 seconds*/
+				setInterval(drawNextChart, cTransitionTime*1000)				
+			}	
+
+			function drawPreviousChart()
+			{
+				if(cIndex==0)
+					cIndex=selectedKeys.length-1
+				else
+					cIndex--
+
+				updateChart()
+			}	
+
+			function drawNextChart()
+			{
+				cIndex=(cIndex+1)%selectedKeys.length
+
+				updateChart()
+			}													
+
+			function drawChart()
+			{
+				$('#cTitle').text(pKey)
+
+    			yAxis = d3.svg.axis()
+        				.scale(data[pKey]['yScale'])
+        				.orient('left')  				
+
+				var mSvg = d3.select('#svgChart')
+					        .append('svg')
+					        .attr('width', svgWidth)
+					        .attr('height', data[pKey]['svgHeight'])
+
+				var subSvg = mSvg			        
+					        .append('g')
+					        .attr('transform', 'translate(' + svgMargins.left + ',' + svgMargins.top + ')')
+
+				var barHeight = data[pKey]['yScale'].rangeBand()
+
+				subSvg.append('g')
+					.selectAll('.rect')
+			        .data(data[pKey]['Women'])
+			        .enter()
+			        .append('rect')
+			        .style('fill', '#420067')
+			        .attr('x', 0)
+			        .attr('y', function (d, i) { return data[pKey]['yValues'][i] })
+			        .attr('height', barHeight)	
+					.attr('width', 0)			        
+			        .transition()
+			        .delay(function (d, i) { return i*bTransitionTime*1000 })			        			        
+			        .attr('width', function (d, i) { return data[pKey]['Women']['Width'][i] })
+		        
+				subSvg.append('g')
+					.selectAll('.rect')
+			        .data(data[pKey]['Men'])
+			        .enter()
+			        .append('rect')
+			        .style('fill', '#5B90D8')
+			        .attr('x', function (d, i) { return data[pKey]['Women']['Width'][i] })			        
+			        .attr('y', function (d, i) { return data[pKey]['yValues'][i] })
+			        .attr('height', barHeight)			        			        
+					.attr('width', 0)			        			        
+			        .transition()
+			        .delay(function (d, i) { return i*bTransitionTime*1000 })				        
+			        .attr('width', function (d, i) { return data[pKey]['Men']['Width'][i] })
+
+				subSvg.append('g')
+					.selectAll('.text')				
+			        .data(data[pKey]['Women'])
+			        .enter()
+					.append('text')
+					.attr('x', function(d, i) { return data[pKey]['Women']['Width'][i]-5 })
+					.attr('y', function(d, i) { return data[pKey]['yValues'][i]+barHeight/2 })
+					.attr('dy', '.35em')
+					.style({'fill':'white', 'font':'12pt GillSans Light', 'text-anchor':'end'})
+					.text(function(d) { 
+						if(d>5) 
+							return d
+						else
+							return ''
+					})		
+
+				subSvg.append('g')
+					.selectAll('.text')
+			        .data(data[pKey]['Men'])
+			        .enter()
+					.append('text')
+					.attr('x', function(d, i) { return data[pKey]['Women']['Width'][i]+5 })
+					.attr('y', function(d, i) { return data[pKey]['yValues'][i]+barHeight/2 })
+					.attr('dy', '.35em')
+					.style({'fill':'white', 'font':'12pt GillSans Light', 'text-anchor':'start'})
+					.text(function(d) { 
+						if(d>5) 
+							return d
+						else
+							return ''
+					})									    	
+
+			    subSvg.append('g')
+			        .attr('class', 'axis')
+			        .attr('transform', 'translate(0,' + (data[pKey]['svgHeight']-svgMargins.bottom) + ')')
+			        .call(xAxis)
+
+				subSvg.append('g')
+				    .attr('class', 'axis')
+				    .call(yAxis)
+
+				var arrayLength = xAxisTicks.length, yAxisExtents = data[pKey]['yScale'].rangeExtent()	     					
+
+				for (var index = 0; index < arrayLength; index++) 
+				{
+					var xPos = xScale(xAxisTicks[index])
+
+					subSvg.append('line')
+					    .style({'stroke':'black', 'stroke-dasharray':'3,6', 'stroke-linecap':'round'})
+					    .attr("x1", xPos)
+					    .attr("y1", 0)
+					    .attr("x2", xPos)
+					    .attr("y2", yAxisExtents[1])					
+				}
+
+			}
+
+			function preComputeValues()
+			{
+				var labelHeight=$('#dLabels').height(), legendHeight=$('#dLegend').height(), adHeight=35
+
+				svgWidth = $('#divContent').width()
+
+				xScaleWidth=svgWidth-svgMargins.left-svgMargins.right
+
+    			xScale = d3.scale.linear()
+        				.domain([0,100])
+        				.range([0, xScaleWidth])
+
+    			xAxis = d3.svg.axis()
+        				.scale(xScale)
+        				.tickValues(xAxisTicks)
+        				.tickFormat( function(d) { return d+"%" } )
+        				.orient('bottom')
+
+				allKeys=[]        				   
+
+				$('#cTitle').hide()
+				
+				for(var key in data)
+				{
+					allKeys.push(key)
+
+					$('#cTitle').text(key)
+
+					data[key]['svgHeight']=$('#divContent').height()-$('#dTitle').height()-labelHeight-legendHeight-adHeight
+
+					data[key]['yScale']=d3.scale.ordinal()
+										.domain(data[key]['yAxisTicks'])
+        								.rangeRoundBands([0, data[key]['svgHeight']-svgMargins.top-svgMargins.bottom], .05)
+					
+					data[key]['yValues']=data[key]['yScale'].range()
+
+					data[key]['Women']['Width']=[]
+					data[key]['Men']['Width']=[]
+
+					var arrayLength = data[key]['Women'].length;
+
+					for (var value = 0; value < arrayLength; value++) 
+					{
+						data[key]['Women']['Width'].push( Math.floor(xScale(data[key]['Women'][value])) )	
+						data[key]['Men']['Width'].push( xScaleWidth-data[key]['Women']['Width'][value] )	
+					}					
+
+				}
+
+				selectedKeys=allKeys		
+				$('#cTitle').show()									
+
+				drawNextChart()   			
+			}
+	
+			window.onload = function()
+			{
+
+				d3.csv("Orgs.csv")
+					.row( function(row){
+
+						if(!(row.Org in data))
+						{
+							data[row.Org]={}
+
+							data[row.Org]['Women']=[]
+							data[row.Org]['Men']=[]
+
+							data[row.Org]['yAxisTicks']=[]
+						}
+
+						data[row.Org]['Women'].push( parseFloat(row.W) )
+						data[row.Org]['Men'].push( 100-parseFloat(row.W) )
+
+						data[row.Org]['yAxisTicks'].push( 'L-'+row.L )
+
+						return row;
+
+					})
+    				.get(function(error, rows) { preComputeValues() })
+			}			
+
+		</script>
+
+	</head>
+
+	<body>
+		
+		<div id="divContent" align="center">
+
+			<div id="dTitle">
+				<label id="cTitle"></label><br>
+			</div>	
+
+			<div id="svgChart">
+
+			    <div id="controls">
+			        <img src="css/images/previous.png" id="prev" />
+			        <img src="css/images/next.png" id="next" />
+			    </div>				
+
+			</div>			
+
+			<div id="dLabels">
+				<label id="firstLabel">Gender Split in Management Roles</label><br>
+				<label id="secondLabel">Reporting Distance from CEO</label><br>
+				<label id="thirdLabel">Source: Adapted from WGEA 2015</label><br><br>
+			</div>				
+
+			<div id="dLegend">
+				<span class="sLegend"><span class="wLegend"></span>&nbsp;Women%</span>
+				<span class="sLegend"><span class="mLegend"></span>&nbsp;Men%</span>
+			</div>		
+					
+		</div>
+
+	</body>
+
+</html>

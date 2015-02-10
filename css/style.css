@@ -1,0 +1,115 @@
+/*
+Organisation Name: Calibri 12pt bold
+
+Y Axis - level numbers: Calibri 10 pt
+X Axis - % numbers: Calibri 10 pt
+Number labels on each bar: GillSans Light 14			
+
+Series label: Calibri 10pt
+
+X/Y Axis labels: Calibri 10pt bold
+X axis 'source' line: Calibri 6pt			
+*/
+
+#svgChart:hover #controls {
+
+	display: block;
+}
+
+#controls {
+
+	position: relative;
+	width: 100%;
+	display: none;
+	z-index: 999;
+}
+
+#controls #prev { position: absolute; left: 0; }
+#controls #next { position: absolute; right: 0; }        	
+
+#divContent {
+
+	width: 340px;
+	height: 370px;
+	overflow: auto
+}
+
+#cTitle {
+
+	font-family: Calibri;
+	font-size: 12pt;
+	font-weight: bold;
+
+	/* Top Right Bottom Left*/
+	margin: 0px 0px 10px 0px;								
+	display: inline-block								
+}
+
+#firstLabel {
+
+	font-family: Calibri;
+	font-size: 10pt;
+	font-weight: bold;
+
+	margin: 15px 0px 0px 0px;
+	display: inline-block				
+}	
+
+#secondLabel {
+
+	font-family: Calibri;
+	font-size: 10pt;
+	font-weight: bold;				
+}				
+
+#thirdLabel {
+
+	font-family: Calibri;
+	font-size: 6pt;
+	font-weight: normal;																				
+}
+
+#dLegend { 
+
+	font-family: Calibri; 
+	font-size: 10pt; 
+	font-weight: normal;
+}
+
+#dLegend .sLegend { 
+
+	margin-right: 10px;
+}			
+
+#dLegend .sLegend span { 
+
+	border: 1px solid #ccc; 
+	display:inline-block;
+
+	width: 8px; 
+	height: 8px; 
+	margin: 3px 0px 0px 0px; 
+}
+
+#dLegend .slegend .wLegend { 
+
+	background-color: #420067; 				
+}
+
+#dLegend .slegend .mLegend { 
+
+	background-color: #5B90D8; 
+}			
+
+.axis path, .axis line {
+
+    fill: none;
+    stroke: none;
+}
+
+.axis text {
+
+    font-family: Calibri;
+    font-size: 10pt;
+    font-weight: bold;
+}		
