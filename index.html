@@ -4,8 +4,8 @@
 
     <head>
 
-        <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
-        <meta content="utf-8" http-equiv="encoding">
+		<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+		<meta content="utf-8" http-equiv="encoding">
 
 		<link rel="stylesheet" type="text/css" href="css/style.css">
 
@@ -43,19 +43,19 @@
 
 				$('#controls').css('top', (data[pKey]['svgHeight']/2-16)+'px')	
 
-			    $('#next').click( function() {
-			    	
-			    	removeTimer()
+				$('#next').click( function() {
+					
+					removeTimer()
 					drawNextChart()
 					addTimer()
-			    })							    
+				})							    
 
 				$('#prev').click(function() {
 
 					removeTimer()
 					drawPreviousChart()
 					addTimer()
-			    })				
+				})				
 			
 				drawChart()
 			}	
@@ -90,56 +90,56 @@
         				.orient('left')  				
 
 				var mSvg = d3.select('#svgChart')
-					        .append('svg')
-					        .attr('width', svgWidth)
-					        .attr('height', data[pKey]['svgHeight'])
+							.append('svg')
+							.attr('width', svgWidth)
+							.attr('height', data[pKey]['svgHeight'])
 
 				var subSvg = mSvg			        
-					        .append('g')
-					        .attr('transform', 'translate(' + svgMargins.left + ',' + svgMargins.top + ')')
+							.append('g')
+							.attr('transform', 'translate(' + svgMargins.left + ',' + svgMargins.top + ')')
 
 				subSvg.append("text")
-				        .attr("transform", "rotate(-90)")
-				        .attr("y", 0-svgMargins.left)
-				        .attr("x", 0-(data[pKey]['svgHeight']/2))
-				        .attr("dy", "1em")
-				        .style({'font-family':'Calibri', 'font-size': '10pt', 'font-weight': 'bold', 'text-anchor':'middle'})
-				        .text("Level from CEO")					        
+					.attr("transform", "rotate(-90)")
+					.attr("y", 0-svgMargins.left)
+					.attr("x", 0-(data[pKey]['svgHeight']/2))
+					.attr("dy", "1em")
+					.style({'font-family':'Calibri', 'font-size': '10pt', 'font-weight': 'bold', 'text-anchor':'middle'})
+					.text("Level from CEO")					        
 
 				var barHeight = data[pKey]['yScale'].rangeBand()
 
 				subSvg.append('g')
 					.selectAll('.rect')
-			        .data(data[pKey]['Women'])
-			        .enter()
-			        .append('rect')
-			        .style('fill', '#420067')
-			        .attr('x', 0)
-			        .attr('y', function (d, i) { return data[pKey]['yValues'][i] })
-			        .attr('height', barHeight)	
+					.data(data[pKey]['Women'])
+					.enter()
+					.append('rect')
+					.style('fill', '#420067')
+					.attr('x', 0)
+					.attr('y', function (d, i) { return data[pKey]['yValues'][i] })
+					.attr('height', barHeight)	
 					.attr('width', 0)			        
-			        .transition()
-			        .delay(function (d, i) { return i*bTransitionTime*1000 })			        			        
-			        .attr('width', function (d, i) { return data[pKey]['Women']['Width'][i] })
-		        
+					.transition()
+					.delay(function (d, i) { return i*bTransitionTime*1000 })			        			        
+					.attr('width', function (d, i) { return data[pKey]['Women']['Width'][i] })
+
 				subSvg.append('g')
 					.selectAll('.rect')
-			        .data(data[pKey]['Men'])
-			        .enter()
-			        .append('rect')
-			        .style('fill', '#5B90D8')
-			        .attr('x', function (d, i) { return data[pKey]['Women']['Width'][i] })			        
-			        .attr('y', function (d, i) { return data[pKey]['yValues'][i] })
-			        .attr('height', barHeight)			        			        
+					.data(data[pKey]['Men'])
+					.enter()
+					.append('rect')
+					.style('fill', '#5B90D8')
+					.attr('x', function (d, i) { return data[pKey]['Women']['Width'][i] })			        
+					.attr('y', function (d, i) { return data[pKey]['yValues'][i] })
+					.attr('height', barHeight)			        			        
 					.attr('width', 0)			        			        
-			        .transition()
-			        .delay(function (d, i) { return i*bTransitionTime*1000 })				        
-			        .attr('width', function (d, i) { return data[pKey]['Men']['Width'][i] })
+					.transition()
+					.delay(function (d, i) { return i*bTransitionTime*1000 })				        
+					.attr('width', function (d, i) { return data[pKey]['Men']['Width'][i] })
 
 				subSvg.append('g')
 					.selectAll('.text')				
-			        .data(data[pKey]['Women'])
-			        .enter()
+					.data(data[pKey]['Women'])
+					.enter()
 					.append('text')
 					.attr('x', function(d, i) { return data[pKey]['Women']['Width'][i]-5 })
 					.attr('y', function(d, i) { return data[pKey]['yValues'][i]+barHeight/2 })
@@ -154,8 +154,8 @@
 
 				subSvg.append('g')
 					.selectAll('.text')
-			        .data(data[pKey]['Men'])
-			        .enter()
+					.data(data[pKey]['Men'])
+					.enter()
 					.append('text')
 					.attr('x', function(d, i) { return data[pKey]['Women']['Width'][i]+5 })
 					.attr('y', function(d, i) { return data[pKey]['yValues'][i]+barHeight/2 })
@@ -168,14 +168,14 @@
 							return ''
 					})									    	
 
-			    subSvg.append('g')
-			        .attr('class', 'xAxis')
-			        .attr('transform', 'translate(0,' + (data[pKey]['svgHeight']-svgMargins.bottom) + ')')
-			        .call(xAxis)
+				subSvg.append('g')
+					.attr('class', 'xAxis')
+					.attr('transform', 'translate(0,' + (data[pKey]['svgHeight']-svgMargins.bottom) + ')')
+					.call(xAxis)
 
 				subSvg.append('g')
-				    .attr('class', 'yAxis')
-				    .call(yAxis)
+					.attr('class', 'yAxis')
+					.call(yAxis)
 
 				var arrayLength = xAxisTicks.length, yAxisExtents = data[pKey]['yScale'].rangeExtent()	     					
 
@@ -184,11 +184,11 @@
 					var xPos = xScale(xAxisTicks[index])
 
 					subSvg.append('line')
-					    .style({'stroke':'black', 'stroke-dasharray':'3,6', 'stroke-linecap':'round'})
-					    .attr("x1", xPos)
-					    .attr("y1", 0)
-					    .attr("x2", xPos)
-					    .attr("y2", yAxisExtents[1])					
+						.style({'stroke':'black', 'stroke-dasharray':'3,6', 'stroke-linecap':'round'})
+						.attr("x1", xPos)
+						.attr("y1", 0)
+						.attr("x2", xPos)
+						.attr("y2", yAxisExtents[1])					
 				}
 
 			}
@@ -228,15 +228,15 @@
 
 				xScaleWidth=svgWidth-svgMargins.left-svgMargins.right
 
-    			xScale = d3.scale.linear()
-        				.domain([0,100])
-        				.range([0, xScaleWidth])
+				xScale = d3.scale.linear()
+					.domain([0,100])
+					.range([0, xScaleWidth])
 
     			xAxis = d3.svg.axis()
-        				.scale(xScale)
-        				.tickValues(xAxisTicks)
-        				.tickFormat( function(d) { return d+"%" } )
-        				.orient('bottom')
+					.scale(xScale)
+					.tickValues(xAxisTicks)
+					.tickFormat( function(d) { return d+"%" } )
+					.orient('bottom')
 
 				allKeys=[] 
 				allModifiedKeys=[]       				   
@@ -374,10 +374,10 @@
 			</div>	
 
 			<div id="svgChart">
-			    <div id="controls">
-			        <img src="css/images/previous.png" id="prev" />
-			        <img src="css/images/next.png" id="next" />
-			    </div>				
+				<div id="controls">
+					<img src="css/images/previous.png" id="prev" />
+					<img src="css/images/next.png" id="next" />
+				</div>				
 			</div>			
 
 			<div id="dLabels">
